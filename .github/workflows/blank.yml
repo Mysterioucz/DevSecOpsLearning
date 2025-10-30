@@ -1,4 +1,4 @@
-name: Vitest
+name: CI & Deploy
 on:
   push:
     branches: [main, master]
@@ -20,3 +20,14 @@ jobs:
         run: npm run lint
       - name: Run Vitest
         run: npx vitest run
+      - name: Deploy to Vercel (Production)
+        if: github.ref == 'push'
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run:
+          npm install --global vercel
+          vercel --yes --environment=production --token=$VERCEL_TOKEN
+          vercel build --prod --token=$VERCEL_TOKEN
+          vercel deploy --prod --token=$VERCEL_TOKEN
